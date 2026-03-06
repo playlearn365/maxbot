@@ -521,57 +521,7 @@ setInterval(()=>{
   eL.style.transform=eR.style.transform='scaleY(0.08)';
   setTimeout(()=>{eL.style.transform=eR.style.transform='';},140);
 },4000);
+
 </script>
 </body>
 </html>
-async function speak(text) {
-  const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[\u2600-\u27FF]/g,'').trim();
-  if (!clean) return;
-
-  // 先嘗試 Google TTS（聲音最自然，iOS 也能用）
-  try {
-    const res = await fetch(
-      'https://texttospeech.googleapis.com/v1/text:synthesize?key=' + apiKey,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          input: { text: clean },
-          voice: { languageCode: 'zh-TW', name: 'zh-TW-Wavenet-A', ssmlGender: 'FEMALE' },
-          audioConfig: { audioEncoding: 'MP3', speakingRate: 0.88, pitch: 2.0 }
-        })
-      }
-    );
-    if (!res.ok) throw new Error('TTS ' + res.status);
-    const data = await res.json();
-    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
-    audio.play();
-    return; // 成功就直接回傳
-  } catch(e) {
-    console.warn('Google TTS 失敗，改用瀏覽器 TTS:', e.message);
-  }
-
-  // Fallback: 瀏覽器內建 TTS（分句播放，比較穩定）
-  if (!window.speechSynthesis) return;
-  speechSynthesis.cancel();
-  const sentences = clean.match(/[^，。！？、]+[，。！？、]?/g) || [clean];
-  let i = 0;
-  function speakNext() {
-    if (i >= sentences.length) return;
-    const u = new SpeechSynthesisUtterance(sentences[i]);
-    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 1.3; u.volume = 1.0;
-    const voices = speechSynthesis.getVoices();
-    const preferred = ['Meijia', 'Sin-ji', 'Tingting', 'Google 普通話', 'Google Chinese'];
-    let picked = null;
-    for (const name of preferred) {
-      picked = voices.find(v => v.name.includes(name));
-      if (picked) break;
-    }
-    if (!picked) picked = voices.find(v => v.lang === 'zh-TW') || voices.find(v => v.lang.startsWith('zh'));
-    if (picked) u.voice = picked;
-    u.onend = () => { i++; speakNext(); };
-    u.onerror = () => { i++; speakNext(); };
-    speechSynthesis.speak(u);
-  }
-  speakNext();
-}
