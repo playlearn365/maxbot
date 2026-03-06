@@ -227,6 +227,14 @@ body {
 <script>
 // ── API Key management ──────────────────────────────
 let apiKey = '';
+let audioCtx = null;
+
+// iOS 需要在使用者手勢中建立 AudioContext 才能播放聲音
+function unlockAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
 
 function onApiInput() {
   const val = document.getElementById('apiKeyInput').value.trim();
@@ -320,6 +328,7 @@ function initRecog() {
 
 function toggleMic() {
   if (loading) return;
+  unlockAudio(); // 在使用者點擊時解鎖音訊
   if (listening) { try { recog && recog.stop(); } catch(e){} return; }
   recog = initRecog();
   if (!recog) { setTranscript('😅 請用 Chrome 瀏覽器開啟', false); return; }
@@ -329,6 +338,7 @@ function toggleMic() {
 // ── Ask Claude (直接從前端呼叫，帶入老師的 Key) ──────
 async function askQ(q) {
   if (loading) return;
+  unlockAudio(); // 解鎖音訊
   loading = true;
   setTranscript('🗣 「' + q + '」', true);
   face('think');
@@ -402,40 +412,94 @@ function emoji(e) {
   el.style.left=(25+Math.random()*50)+'%'; el.style.top='50%';
   document.body.appendChild(el); setTimeout(()=>el.remove(),2100);
 }
+// PCM → WAV 轉換（Gemini TTS 回傳 PCM，需轉成 WAV 才能播放）
+function pcmToWav(pcmData, sampleRate) {
+  const numChannels = 1, bitsPerSample = 16;
+  const dataSize = pcmData.length * 2;
+  const buffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(buffer);
+  const writeStr = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * bitsPerSample / 8, true);
+  view.setUint16(32, numChannels * bitsPerSample / 8, true);
+  view.setUint16(34, bitsPerSample, true);
+  writeStr(36, 'data');
+  view.setUint32(40, dataSize, true);
+  for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
+  return new Blob([view], { type: 'audio/wav' });
+}
+
 async function speak(text) {
   const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[\u2600-\u27FF]/g,'').trim();
   if (!clean) return;
 
   try {
+    // 用 Gemini TTS（跟 Gemini 同一個 Key，iOS 也能播放）
     const res = await fetch(
-      'https://texttospeech.googleapis.com/v1/text:synthesize?key=' + apiKey,
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=' + apiKey,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: { text: clean },
-          voice: { languageCode: 'zh-TW', name: 'zh-TW-Wavenet-A', ssmlGender: 'FEMALE' },
-          audioConfig: { audioEncoding: 'MP3', speakingRate: 0.9, pitch: 2.0 }
+          contents: [{ parts: [{ text: '請用溫柔自然的台灣國語說：' + clean }] }],
+          generationConfig: {
+            responseModalities: ['AUDIO'],
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Aoede' } } }
+          }
         })
       }
     );
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({}));
-      console.error('TTS failed:', res.status, err?.error?.message);
-      throw new Error(res.status);
-    }
+    if (!res.ok) throw new Error('TTS ' + res.status);
     const data = await res.json();
-    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
-    await audio.play();
+    const audioData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    const mimeType = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || '';
+    if (!audioData) throw new Error('no audio data');
+
+    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)?.[1] || '24000', 10);
+    const binary = atob(audioData);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const pcm16 = new Int16Array(bytes.buffer);
+    const wavBlob = pcmToWav(pcm16, sampleRate);
+    const url = URL.createObjectURL(wavBlob);
+    const audio = new Audio(url);
+    audio.onended = () => URL.revokeObjectURL(url);
+    audio.play();
+    return;
   } catch(e) {
-    console.error('Google TTS error:', e);
-    // fallback
-    if (!window.speechSynthesis) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(clean);
-    u.lang = 'zh-TW'; u.rate = 0.85; u.pitch = 1.2;
+    console.warn('Gemini TTS 失敗:', e.message);
+  }
+
+  // Fallback: 瀏覽器內建 TTS
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const sentences = clean.match(/[^，。！？、]+[，。！？、]?/g) || [clean];
+  let i = 0;
+  function speakNext() {
+    if (i >= sentences.length) return;
+    const u = new SpeechSynthesisUtterance(sentences[i]);
+    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 1.3; u.volume = 1.0;
+    const voices = speechSynthesis.getVoices();
+    const preferred = ['Meijia', 'Sin-ji', 'Tingting', 'Google 普通話', 'Google Chinese'];
+    let picked = null;
+    for (const name of preferred) {
+      picked = voices.find(v => v.name.includes(name));
+      if (picked) break;
+    }
+    if (!picked) picked = voices.find(v => v.lang === 'zh-TW') || voices.find(v => v.lang.startsWith('zh'));
+    if (picked) u.voice = picked;
+    u.onend = () => { i++; speakNext(); };
+    u.onerror = () => { i++; speakNext(); };
     speechSynthesis.speak(u);
   }
+  speakNext();
 }
 setInterval(()=>{
   if(listening) return;
@@ -447,3 +511,54 @@ setInterval(()=>{
 </script>
 </body>
 </html>
+async function speak(text) {
+  const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[\u2600-\u27FF]/g,'').trim();
+  if (!clean) return;
+
+  // 先嘗試 Google TTS（聲音最自然，iOS 也能用）
+  try {
+    const res = await fetch(
+      'https://texttospeech.googleapis.com/v1/text:synthesize?key=' + apiKey,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: { text: clean },
+          voice: { languageCode: 'zh-TW', name: 'zh-TW-Wavenet-A', ssmlGender: 'FEMALE' },
+          audioConfig: { audioEncoding: 'MP3', speakingRate: 0.88, pitch: 2.0 }
+        })
+      }
+    );
+    if (!res.ok) throw new Error('TTS ' + res.status);
+    const data = await res.json();
+    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+    audio.play();
+    return; // 成功就直接回傳
+  } catch(e) {
+    console.warn('Google TTS 失敗，改用瀏覽器 TTS:', e.message);
+  }
+
+  // Fallback: 瀏覽器內建 TTS（分句播放，比較穩定）
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const sentences = clean.match(/[^，。！？、]+[，。！？、]?/g) || [clean];
+  let i = 0;
+  function speakNext() {
+    if (i >= sentences.length) return;
+    const u = new SpeechSynthesisUtterance(sentences[i]);
+    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 1.3; u.volume = 1.0;
+    const voices = speechSynthesis.getVoices();
+    const preferred = ['Meijia', 'Sin-ji', 'Tingting', 'Google 普通話', 'Google Chinese'];
+    let picked = null;
+    for (const name of preferred) {
+      picked = voices.find(v => v.name.includes(name));
+      if (picked) break;
+    }
+    if (!picked) picked = voices.find(v => v.lang === 'zh-TW') || voices.find(v => v.lang.startsWith('zh'));
+    if (picked) u.voice = picked;
+    u.onend = () => { i++; speakNext(); };
+    u.onerror = () => { i++; speakNext(); };
+    speechSynthesis.speak(u);
+  }
+  speakNext();
+}
