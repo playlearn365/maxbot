@@ -399,34 +399,44 @@ function emoji(e) {
   el.style.left=(25+Math.random()*50)+'%'; el.style.top='50%';
   document.body.appendChild(el); setTimeout(()=>el.remove(),2100);
 }
-function speak(text) {
-  if(!window.speechSynthesis) return;
-  speechSynthesis.cancel();
-  const clean=text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[\u2600-\u27FF]/g,'');
-  const u=new SpeechSynthesisUtterance(clean);
-  u.lang='zh-TW';
-  u.rate=0.78;   // 慢一點，小朋友好懂
-  u.pitch=1.35;  // 高一點，比較活潑
-  u.volume=1.0;
+async function speak(text) {
+  const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[\u2600-\u27FF]/g,'').trim();
+  if (!clean) return;
 
-  // 優先選最自然的中文語音
-  const voices = speechSynthesis.getVoices();
-  const preferred = [
-    'Google 普通話（台灣）', 'Google Chinese (Traditional)',
-    'Meijia', 'Tingting', 'Sin-ji',
-    'Microsoft HsiaoYu', 'Microsoft Zhiwei',
-  ];
-  let picked = null;
-  for (const name of preferred) {
-    picked = voices.find(v => v.name.includes(name));
-    if (picked) break;
+  try {
+    // 用 Google TTS API 產生音訊
+    const res = await fetch(
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: { text: clean },
+          voice: {
+            languageCode: 'zh-TW',
+            name: 'zh-TW-Wavenet-A',  // 最自然的台灣中文女聲
+            ssmlGender: 'FEMALE'
+          },
+          audioConfig: {
+            audioEncoding: 'MP3',
+            speakingRate: 0.9,
+            pitch: 3.0
+          }
+        })
+      }
+    );
+    if (!res.ok) throw new Error('TTS API failed');
+    const data = await res.json();
+    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+    audio.play();
+  } catch(e) {
+    // fallback 到瀏覽器內建 TTS
+    if (!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang='zh-TW'; u.rate=0.85; u.pitch=1.2;
+    speechSynthesis.speak(u);
   }
-  // fallback: any zh-TW first, then any zh
-  if (!picked) picked = voices.find(v => v.lang === 'zh-TW');
-  if (!picked) picked = voices.find(v => v.lang.startsWith('zh'));
-  if (picked) u.voice = picked;
-
-  speechSynthesis.speak(u);
 }
 setInterval(()=>{
   if(listening) return;
