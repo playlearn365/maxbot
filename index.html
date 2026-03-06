@@ -448,7 +448,7 @@ async function speak(text) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: '請用溫柔自然的台灣國語說：' + clean }] }],
+          contents: [{ parts: [{ text: '請用活潑輕快的台灣國語說（語速稍快）：' + clean }] }],
           generationConfig: {
             responseModalities: ['AUDIO'],
             speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Aoede' } } }
@@ -469,9 +469,22 @@ async function speak(text) {
     const pcm16 = new Int16Array(bytes.buffer);
     const wavBlob = pcmToWav(pcm16, sampleRate);
     const url = URL.createObjectURL(wavBlob);
-    const audio = new Audio(url);
-    audio.onended = () => URL.revokeObjectURL(url);
-    audio.play();
+
+    // iOS 需要用已解鎖的 AudioContext 來播放
+    if (audioCtx) {
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      const arrayBuf = await wavBlob.arrayBuffer();
+      const decoded = await audioCtx.decodeAudioData(arrayBuf);
+      const src = audioCtx.createBufferSource();
+      src.buffer = decoded;
+      src.connect(audioCtx.destination);
+      src.start(0);
+      src.onended = () => URL.revokeObjectURL(url);
+    } else {
+      const audio = new Audio(url);
+      audio.onended = () => URL.revokeObjectURL(url);
+      await audio.play();
+    }
     return;
   } catch(e) {
     console.warn('Gemini TTS 失敗:', e.message);
