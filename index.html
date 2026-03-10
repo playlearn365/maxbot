@@ -28,59 +28,83 @@ body {
 .flowers { position:fixed; bottom:52px; width:100%; text-align:center; font-size:1.4rem; letter-spacing:16px; pointer-events:none; z-index:2; }
 .ground  { position:fixed; bottom:0; width:100%; height:52px; background:#6BCB77; border-top:5px solid #5aaa66; z-index:1; }
 
-/* ── API KEY SCREEN ─────────────────────────────── */
-#apiScreen {
+/* ── 共用 CARD 樣式 ── */
+.screen {
   position:fixed; inset:0; z-index:100;
   display:flex; align-items:center; justify-content:center;
   background:linear-gradient(180deg,#87CEEB 0%,#c9e8f7 55%,#a8dba8 100%);
 }
-.api-card {
-  background:#fff; border-radius:28px; padding:36px 28px;
-  max-width:380px; width:90%; text-align:center;
+.card {
+  background:#fff; border-radius:28px; padding:32px 28px;
+  max-width:400px; width:92%; text-align:center;
   box-shadow:0 20px 60px rgba(0,0,0,.18);
   animation:popIn .5s ease;
+  max-height:90vh; overflow-y:auto;
 }
 @keyframes popIn { 0%{transform:scale(.85);opacity:0} 70%{transform:scale(1.03)} 100%{transform:scale(1);opacity:1} }
-.api-icon  { font-size:3.5rem; margin-bottom:10px; }
-.api-title { font-size:1.7rem; font-weight:900; color:#2D2D2D; margin-bottom:6px; }
-.api-desc  { font-size:.95rem; font-weight:700; color:#666; line-height:1.6; margin-bottom:20px; }
-.api-desc a { color:#4D96FF; text-decoration:none; }
-.api-input {
-  width:100%; padding:14px 16px; font-size:1rem; font-weight:700;
+.card-icon  { font-size:3rem; margin-bottom:8px; }
+.card-title { font-size:1.6rem; font-weight:900; color:#2D2D2D; margin-bottom:6px; }
+.card-desc  { font-size:.92rem; font-weight:700; color:#666; line-height:1.6; margin-bottom:18px; }
+.card-desc a { color:#4D96FF; text-decoration:none; }
+.field-label { font-size:.85rem; font-weight:800; color:#555; text-align:left; margin-bottom:5px; }
+.field-input {
+  width:100%; padding:12px 16px; font-size:1rem; font-weight:700;
   font-family:inherit; border:3px solid #e0e0e0; border-radius:14px;
-  outline:none; transition:border-color .2s; margin-bottom:8px;
-  color:#333; letter-spacing:.5px;
+  outline:none; transition:border-color .2s; margin-bottom:14px; color:#333;
 }
-.api-input:focus { border-color:#4D96FF; }
-.api-input.error { border-color:#FF4757; }
-.api-hint { font-size:.82rem; font-weight:700; color:#aaa; margin-bottom:18px; text-align:left; }
-.api-hint.err { color:#FF4757; }
-.api-btn {
-  width:100%; padding:16px; font-size:1.2rem; font-weight:900;
+.field-input:focus { border-color:#4D96FF; }
+.hint { font-size:.8rem; font-weight:700; color:#aaa; margin-bottom:16px; text-align:left; }
+.save-row { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.save-row input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:#4D96FF; }
+.save-row label { font-size:.88rem; font-weight:700; color:#555; cursor:pointer; }
+.primary-btn {
+  width:100%; padding:15px; font-size:1.15rem; font-weight:900;
   font-family:inherit; border:none; border-radius:50px; cursor:pointer;
   background:linear-gradient(135deg,#4D96FF,#2563EB); color:#fff;
-  box-shadow:0 6px 0 rgba(37,99,235,.35); transition:all .15s;
+  box-shadow:0 6px 0 rgba(37,99,235,.35); transition:all .15s; margin-bottom:10px;
 }
-.api-btn:active { transform:translateY(3px); box-shadow:0 3px 0 rgba(37,99,235,.35); }
-.api-btn:disabled { background:#ccc; box-shadow:none; cursor:not-allowed; }
-.api-save-row { display:flex; align-items:center; gap:8px; margin-bottom:18px; }
-.api-save-row input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:#4D96FF; }
-.api-save-row label { font-size:.9rem; font-weight:700; color:#555; cursor:pointer; }
-.api-change-btn {
-  position:fixed; top:14px; left:14px; z-index:50;
+.primary-btn:active { transform:translateY(3px); box-shadow:0 3px 0 rgba(37,99,235,.35); }
+.primary-btn:disabled { background:#ccc; box-shadow:none; cursor:not-allowed; }
+.secondary-btn {
+  width:100%; padding:12px; font-size:1rem; font-weight:800;
+  font-family:inherit; border:3px solid #e0e0e0; border-radius:50px;
+  cursor:pointer; background:#fff; color:#666; transition:all .15s;
+}
+.secondary-btn:hover { border-color:#4D96FF; color:#4D96FF; }
+
+/* 圖片上傳區 */
+.img-upload-area {
+  border:3px dashed #BFDBFE; border-radius:16px; padding:16px;
+  margin-bottom:14px; cursor:pointer; transition:border-color .2s;
+  background:#F0F7FF;
+}
+.img-upload-area:hover { border-color:#4D96FF; }
+.img-preview {
+  width:90px; height:90px; border-radius:50%; object-fit:cover;
+  border:3px solid #4D96FF; margin-bottom:8px;
+}
+.img-upload-text { font-size:.88rem; font-weight:800; color:#4D96FF; }
+.img-upload-sub  { font-size:.75rem; font-weight:700; color:#94A3B8; margin-top:3px; }
+
+/* ── 頂部按鈕 ── */
+.top-btn {
+  position:fixed; top:14px; z-index:50;
   background:rgba(255,255,255,.88); border:2px solid #4D96FF;
   border-radius:50px; padding:7px 14px; font-size:.85rem; font-weight:800;
   font-family:inherit; color:#4D96FF; cursor:pointer; display:none;
   box-shadow:0 3px 10px rgba(0,0,0,.1);
 }
+#changeKeyBtn  { left:14px; }
 
-/* ── MAIN APP ───────────────────────────────────── */
+
+/* ── MAIN APP ── */
 #app { display:none; width:100%; }
 .wrap { width:100%; max-width:640px; margin:0 auto; padding:16px 16px 120px; display:flex; flex-direction:column; align-items:center; gap:14px; z-index:10; position:relative; }
 .title { font-size:2.2rem; font-weight:900; color:#fff; text-shadow:3px 3px 0 rgba(0,0,0,.15); letter-spacing:2px; text-align:center; margin-top:4px; }
 .sub   { font-size:1rem; font-weight:700; color:rgba(255,255,255,.9); text-align:center; }
 .robot-wrap { animation: rf 3s ease-in-out infinite; }
 @keyframes rf { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.robot-img { width:120px; height:120px; border-radius:50%; object-fit:cover; filter:drop-shadow(0 8px 14px rgba(0,0,0,.2)); display:none; }
 .robot-svg { width:120px; height:120px; filter:drop-shadow(0 8px 14px rgba(0,0,0,.2)); }
 .bubble {
   background:#fff; border-radius:22px; padding:16px 20px;
@@ -134,46 +158,68 @@ body {
 <div class="flowers">🌸🌻🌷🌼🌸🌻🌷</div>
 <div class="ground"></div>
 
-<!-- ── API KEY SCREEN ── -->
-<div id="apiScreen">
-  <div class="api-card">
-    <div class="api-icon">🔑</div>
-    <div class="api-title">老師你好！</div>
-    <div class="api-desc">
+<!-- ── STEP 1: API KEY ── -->
+<div class="screen" id="apiScreen">
+  <div class="card">
+    <div class="card-icon">🔑</div>
+    <div class="card-title">老師你好！</div>
+    <div class="card-desc">
       請輸入你的 <strong>Google Gemini API Key</strong><br>
-      才能讓麥斯小天使回答小朋友的問題 😊<br><br>
+      才能讓機器人回答小朋友的問題 😊<br><br>
       還沒有 Key？<a href="https://aistudio.google.com/apikey" target="_blank">點這裡申請</a>
     </div>
-    <input
-      class="api-input"
-      id="apiKeyInput"
-      type="password"
-      placeholder="AIza..."
-      autocomplete="off"
-      oninput="onApiInput()"
-    />
-    <div class="api-hint" id="apiHint">Key 只存在你的裝置上，不會上傳到任何地方 🔒</div>
-    <div class="api-save-row">
+    <div class="field-label">API Key</div>
+    <input class="field-input" id="apiKeyInput" type="password" placeholder="AIza..." autocomplete="off" oninput="onApiInput()"/>
+    <div class="hint" id="apiHint">Key 只存在你的裝置上，不會上傳到任何地方 🔒</div>
+    <div class="save-row">
       <input type="checkbox" id="rememberKey" checked>
       <label for="rememberKey">記住 Key，下次不用重新輸入</label>
     </div>
-    <button class="api-btn" id="apiBtn" onclick="startApp()" disabled>
-      開始使用 👼
-    </button>
+    <button class="primary-btn" id="apiBtn" onclick="goToSettings()" disabled>下一步：設定機器人 →</button>
   </div>
 </div>
 
-<!-- Change API key button (shown in app) -->
-<button class="api-change-btn" id="changeKeyBtn" onclick="showApiScreen()">🔑 更換 Key</button>
+<!-- ── STEP 2: 機器人設定 ── -->
+<div class="screen" id="settingsScreen" style="display:none;">
+  <div class="card">
+    <div class="card-icon">🎨</div>
+    <div class="card-title">設定你的機器人</div>
+    <div class="card-desc">幫機器人取個名字、換上你喜歡的圖片！</div>
+
+    <div class="field-label">機器人名字</div>
+    <input class="field-input" id="botNameInput" type="text" placeholder="麥斯小天使" maxlength="10"/>
+
+    <div class="field-label">機器人圖片（選填）</div>
+    <div class="img-upload-area" onclick="document.getElementById('imgFileInput').click()">
+      <img id="imgPreview" class="img-preview" style="display:none;" src="" alt="預覽"/>
+      <div id="imgPlaceholder">
+        <div style="font-size:2.5rem">🤖</div>
+        <div class="img-upload-text">點此上傳圖片</div>
+        <div class="img-upload-sub">JPG、PNG，建議正方形</div>
+      </div>
+    </div>
+    <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="onImgChange(event)"/>
+
+    <button class="primary-btn" onclick="startApp()">開始使用 👼</button>
+    <button class="secondary-btn" onclick="skipSettings()">跳過，用預設設定</button>
+  </div>
+</div>
+
+<!-- ── 頂部按鈕 ── -->
+<button class="top-btn" id="changeKeyBtn" onclick="showApiScreen()">🔑 更換 Key</button>
+
 
 <!-- ── MAIN APP ── -->
 <div id="app">
   <div class="wrap">
-    <div class="title">👼 麥斯小天使</div>
+    <div class="title" id="appTitle">👼 麥斯小天使</div>
     <div class="sub">說出你的問題，我來回答！</div>
 
     <div class="robot-wrap">
-      <svg class="robot-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- 自訂圖片（上傳後顯示） -->
+      <img id="robotImg" class="robot-img" src="" alt="機器人"/>
+      <!-- 預設 SVG -->
+      <svg id="robotSvg" class="robot-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="66" y="4" width="8" height="18" rx="4" fill="#4D96FF"/>
         <circle cx="70" cy="4" r="7" fill="#FFD93D" stroke="#FF9A3C" stroke-width="2"/>
         <rect x="28" y="20" width="84" height="62" rx="18" fill="#4D96FF"/>
@@ -197,7 +243,7 @@ body {
     </div>
 
     <div class="bubble" id="bubble">
-      <div class="bubble-text" id="btext">你好！我是麥斯小天使 😊<br>點麥克風，說出你的問題吧！</div>
+      <div class="bubble-text" id="btext">你好！我是<span id="botNameDisplay">麥斯小天使</span> 😊<br>點麥克風，說出你的問題吧！</div>
     </div>
 
     <div class="status" id="status">👆 點麥克風開始說話</div>
@@ -225,50 +271,19 @@ body {
 </div>
 
 <script>
-// ── API Key management ──────────────────────────────
+// ── 狀態 ──────────────────────────────────────────
 let apiKey = '';
+let botName = '麥斯小天使';
+let botImageData = null; // base64
 let audioCtx = null;
 
-// iOS 需要在使用者手勢中建立 AudioContext 才能播放聲音
 function unlockAudio() {
   if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-function onApiInput() {
-  const val = document.getElementById('apiKeyInput').value.trim();
-  const btn = document.getElementById('apiBtn');
-  const hint = document.getElementById('apiHint');
-  document.getElementById('apiKeyInput').classList.remove('error');
-  hint.className = 'api-hint';
-  hint.textContent = 'Key 只存在你的裝置上，不會上傳到任何地方 🔒';
-  btn.disabled = val.length < 5;
-}
-
-function startApp() {
-  const val = document.getElementById('apiKeyInput').value.trim();
-  if (!val || val.length < 10) return;
-
-  apiKey = val;
-  if (document.getElementById('rememberKey').checked) {
-    try { localStorage.setItem('maxbot_key', val); } catch(e) {}
-  }
-
-  document.getElementById('apiScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('changeKeyBtn').style.display = 'block';
-}
-
-function showApiScreen() {
-  document.getElementById('apiScreen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('changeKeyBtn').style.display = 'none';
-  document.getElementById('apiKeyInput').value = apiKey;
-  document.getElementById('apiBtn').disabled = false;
-}
-
-// Check saved key on load
+// ── 載入儲存的設定 ────────────────────────────────
 window.addEventListener('load', () => {
   try {
     const saved = localStorage.getItem('maxbot_key');
@@ -276,20 +291,120 @@ window.addEventListener('load', () => {
       document.getElementById('apiKeyInput').value = saved;
       document.getElementById('apiBtn').disabled = false;
     }
+    const savedName = localStorage.getItem('maxbot_name');
+    if (savedName) {
+      document.getElementById('botNameInput').value = savedName;
+      botName = savedName;
+    }
+    const savedImg = localStorage.getItem('maxbot_img');
+    if (savedImg) {
+      botImageData = savedImg;
+      showImgPreview(savedImg);
+    }
   } catch(e) {}
   speechSynthesis && speechSynthesis.getVoices();
 });
 
-// ── Speech Recognition ──────────────────────────────
+// ── STEP 1: API Key ───────────────────────────────
+function onApiInput() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  document.getElementById('apiBtn').disabled = val.length < 5;
+}
+
+function goToSettings() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val || val.length < 5) return;
+  apiKey = val;
+  if (document.getElementById('rememberKey').checked) {
+    try { localStorage.setItem('maxbot_key', val); } catch(e) {}
+  }
+  document.getElementById('apiScreen').style.display = 'none';
+  document.getElementById('settingsScreen').style.display = 'flex';
+}
+
+function showApiScreen() {
+  document.getElementById('apiScreen').style.display = 'flex';
+  document.getElementById('settingsScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('changeKeyBtn').style.display = 'none';
+  
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('apiBtn').disabled = false;
+}
+
+// ── STEP 2: 設定 ──────────────────────────────────
+function onImgChange(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    botImageData = ev.target.result;
+    showImgPreview(botImageData);
+    try { localStorage.setItem('maxbot_img', botImageData); } catch(e) {}
+  };
+  reader.readAsDataURL(file);
+}
+
+function showImgPreview(src) {
+  const preview = document.getElementById('imgPreview');
+  preview.src = src;
+  preview.style.display = 'block';
+  document.getElementById('imgPlaceholder').style.display = 'none';
+}
+
+function applySettings() {
+  const nameVal = document.getElementById('botNameInput').value.trim() || '麥斯小天使';
+  botName = nameVal;
+  try { localStorage.setItem('maxbot_name', botName); } catch(e) {}
+
+  // 更新標題
+  document.getElementById('appTitle').textContent = '👼 ' + botName;
+  document.getElementById('botNameDisplay').textContent = botName;
+  document.title = botName;
+
+  // 更新圖片
+  if (botImageData) {
+    document.getElementById('robotImg').src = botImageData;
+    document.getElementById('robotImg').style.display = 'block';
+    document.getElementById('robotSvg').style.display = 'none';
+  } else {
+    document.getElementById('robotImg').style.display = 'none';
+    document.getElementById('robotSvg').style.display = 'block';
+  }
+}
+
+function startApp() {
+  applySettings();
+  document.getElementById('settingsScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('changeKeyBtn').style.display = 'block';
+  
+}
+
+function skipSettings() {
+  document.getElementById('settingsScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('changeKeyBtn').style.display = 'block';
+  
+  applySettings();
+}
+
+function showSettingsScreen() {
+  document.getElementById('settingsScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('botNameInput').value = botName;
+  if (botImageData) showImgPreview(botImageData);
+}
+
+// ── 語音辨識 ──────────────────────────────────────
 let recog = null, listening = false, loading = false, lastText = '';
+let micPermissionGranted = false;
 
 function initRecog() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return null;
   const r = new SR();
-  r.lang = 'zh-TW';
-  r.continuous = false;
-  r.interimResults = true;
+  r.lang = 'zh-TW'; r.continuous = false; r.interimResults = true;
   r.onstart = () => {
     listening = true; lastText = '';
     setMicOn(true);
@@ -318,7 +433,7 @@ function initRecog() {
     listening = false; setMicOn(false);
     document.getElementById('bubble').classList.remove('mic-on');
     setStatus('👆 點麥克風開始說話', false);
-    const msgs = { 'not-allowed':'❌ 請允許麥克風權限後重新整理', 'no-speech':'沒聽到聲音，再試一次 😊', 'network':'網路有點問題 😊', 'aborted':'' };
+    const msgs = { 'not-allowed':'❌ 請允許麥克風權限，然後再點一次麥克風', 'no-speech':'沒聽到聲音，再試一次 😊', 'network':'網路有點問題 😊', 'aborted':'' };
     const m = msgs[e.error] ?? ('錯誤：' + e.error);
     if (m) setTranscript(m, false);
     face('normal');
@@ -326,30 +441,48 @@ function initRecog() {
   return r;
 }
 
-function toggleMic() {
+async function toggleMic() {
   if (loading) return;
-  unlockAudio(); // 在使用者點擊時解鎖音訊
+  unlockAudio();
   if (listening) { try { recog && recog.stop(); } catch(e){} return; }
+
+  // 安卓需要先用 getUserMedia 取得麥克風權限
+  // 有些瀏覽器不用 getUserMedia 就無法啟動 SpeechRecognition
+  if (!micPermissionGranted) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(t => t.stop()); // 取得權限後立即關閉 stream
+      micPermissionGranted = true;
+    } catch(err) {
+      if (err.name === 'NotAllowedError') {
+        setTranscript('❌ 請允許麥克風權限後再試一次', false);
+      } else {
+        setTranscript('麥克風錯誤：' + err.message, false);
+      }
+      return;
+    }
+  }
+
   recog = initRecog();
   if (!recog) { setTranscript('😅 請用 Chrome 瀏覽器開啟', false); return; }
   try { recog.start(); } catch(e) { setTranscript('啟動失敗：' + e.message, false); }
 }
 
-// ── Ask Claude (直接從前端呼叫，帶入老師的 Key) ──────
+// ── 問 Gemini ─────────────────────────────────────
 async function askQ(q) {
   if (loading) return;
-  unlockAudio(); // 解鎖音訊
+  unlockAudio();
   loading = true;
   setTranscript('🗣 「' + q + '」', true);
   face('think');
   setBubble('<div class="dots"><span></span><span></span><span></span></div><br><span style="color:#999;font-size:1rem">讓我想一想... 🤔</span>');
   emoji(['🤔','💭','✨'][Math.random()*3|0]);
-
   try {
     const isStory = q.includes('故事') || q.includes('說故事');
     const SYSTEM = isStory
-      ? `你是幼兒園說故事機器人「麥斯小天使」。請用繁體中文說一個完整有趣的故事給3-6歲小朋友聽。規則：1.故事要有開頭、過程、結尾，至少120個字 2.用簡單有趣的詞語，不要用疊字（不要說「好好吃」要說「很好吃」）3.加入2-3個可愛表情符號 4.語氣溫柔生動 5.結尾要有一個小小的道理或驚喜`
-      : `你是幼兒園問答機器人「麥斯小天使」，專門回答3-6歲小朋友的問題。規則：1.用簡單有趣的繁體中文，像跟小寶貝說話 2.用2-4句話回答，不要太短也不要太長 3.不要使用疊字（例如不要說「好好玩」要說「很好玩」）4.多用小朋友懂的比喻 5.加2個可愛表情符號 6.語氣溫柔自然 7.不適合的問題說「這個讓老師來回答你喔！」8.結尾加一句鼓勵的話`;
+      ? `你是幼兒園說故事機器人「${botName}」。請用繁體中文說一個完整有趣的故事給3-6歲小朋友聽。規則：1.故事要有開頭、過程、結尾，至少120個字 2.用簡單有趣的詞語，不要用疊字 3.加入2-3個可愛表情符號 4.語氣溫柔生動 5.結尾要有一個小小的道理`
+      : `你是幼兒園問答機器人「${botName}」，專門回答3-6歲小朋友的問題。規則：1.用簡單有趣的繁體中文 2.用2-4句話回答 3.不要使用疊字 4.多用小朋友懂的比喻 5.加2個可愛表情符號 6.語氣溫柔自然 7.不適合的問題說「這個讓老師來回答你喔！」8.結尾加一句鼓勵的話`;
+
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
@@ -362,17 +495,18 @@ async function askQ(q) {
         })
       }
     );
-
     if (res.status === 400 || res.status === 403) {
       setBubble('API Key 好像不對 🔑<br>請點左上角「更換 Key」重新輸入');
       face('normal'); loading = false; return;
     }
-    if (!res.ok) {
-      const errData = await res.json().catch(()=>({}));
-      setBubble('錯誤 ' + res.status + '：' + (errData?.error?.message || '請再試一次') + ' 🌀');
+    if (res.status === 429) {
+      setBubble('今天問太多問題了 😅<br>請稍後再來問麥斯喔！');
       face('normal'); loading = false; return;
     }
-
+    if (!res.ok) {
+      setBubble('哎呀出了點問題 🌀<br>請稍後再試一次！');
+      face('normal'); loading = false; return;
+    }
     const data = await res.json();
     const ans = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     if (ans) {
@@ -386,7 +520,7 @@ async function askQ(q) {
   loading = false;
 }
 
-// ── Helpers ─────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────
 function setBubble(html, pop) {
   const b = document.getElementById('btext');
   b.className = 'bubble-text' + (pop?' pop':'');
@@ -412,108 +546,85 @@ function emoji(e) {
   el.style.left=(25+Math.random()*50)+'%'; el.style.top='50%';
   document.body.appendChild(el); setTimeout(()=>el.remove(),2100);
 }
-// PCM → WAV 轉換（Gemini TTS 回傳 PCM，需轉成 WAV 才能播放）
+
+// ── PCM → WAV ─────────────────────────────────────
 function pcmToWav(pcmData, sampleRate) {
-  const numChannels = 1, bitsPerSample = 16;
-  const dataSize = pcmData.length * 2;
-  const buffer = new ArrayBuffer(44 + dataSize);
-  const view = new DataView(buffer);
-  const writeStr = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
-  writeStr(0, 'RIFF');
-  view.setUint32(4, 36 + dataSize, true);
-  writeStr(8, 'WAVE');
-  writeStr(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * numChannels * bitsPerSample / 8, true);
-  view.setUint16(32, numChannels * bitsPerSample / 8, true);
-  view.setUint16(34, bitsPerSample, true);
-  writeStr(36, 'data');
-  view.setUint32(40, dataSize, true);
-  for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
-  return new Blob([view], { type: 'audio/wav' });
+  const numChannels=1, bitsPerSample=16, dataSize=pcmData.length*2;
+  const buffer=new ArrayBuffer(44+dataSize), view=new DataView(buffer);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++)view.setUint8(o+i,s.charCodeAt(i));};
+  ws(0,'RIFF'); view.setUint32(4,36+dataSize,true); ws(8,'WAVE'); ws(12,'fmt ');
+  view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,numChannels,true);
+  view.setUint32(24,sampleRate,true); view.setUint32(28,sampleRate*2,true);
+  view.setUint16(32,2,true); view.setUint16(34,bitsPerSample,true);
+  ws(36,'data'); view.setUint32(40,dataSize,true);
+  for(let i=0;i<pcmData.length;i++) view.setInt16(44+i*2,pcmData[i],true);
+  return new Blob([view],{type:'audio/wav'});
 }
 
+// ── TTS ───────────────────────────────────────────
 async function speak(text) {
-  const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[\u2600-\u27FF]/g,'').trim();
-  if (!clean) return;
-
+  const clean=text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[\u2600-\u27FF]/g,'').trim();
+  if(!clean) return;
   try {
-    // 用 Gemini TTS（跟 Gemini 同一個 Key，iOS 也能播放）
-    const res = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=' + apiKey,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: '請用活潑輕快的台灣國語說（語速稍快）：' + clean }] }],
-          generationConfig: {
-            responseModalities: ['AUDIO'],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Aoede' } } }
+    const res=await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key='+apiKey,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          contents:[{parts:[{text:'請用活潑輕快的台灣國語說（語速稍快）：'+clean}]}],
+          generationConfig:{
+            responseModalities:['AUDIO'],
+            speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:'Aoede'}}}
           }
         })
       }
     );
-    if (!res.ok) throw new Error('TTS ' + res.status);
-    const data = await res.json();
-    const audioData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    const mimeType = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || '';
-    if (!audioData) throw new Error('no audio data');
-
-    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)?.[1] || '24000', 10);
-    const binary = atob(audioData);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    const pcm16 = new Int16Array(bytes.buffer);
-    const wavBlob = pcmToWav(pcm16, sampleRate);
-    const url = URL.createObjectURL(wavBlob);
-
-    // iOS 需要用已解鎖的 AudioContext 來播放
-    if (audioCtx) {
-      if (audioCtx.state === 'suspended') await audioCtx.resume();
-      const arrayBuf = await wavBlob.arrayBuffer();
-      const decoded = await audioCtx.decodeAudioData(arrayBuf);
-      const src = audioCtx.createBufferSource();
-      src.buffer = decoded;
-      src.connect(audioCtx.destination);
-      src.start(0);
-      src.onended = () => URL.revokeObjectURL(url);
+    if(!res.ok) throw new Error('TTS '+res.status);
+    const data=await res.json();
+    const audioData=data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    const mimeType=data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType||'';
+    if(!audioData) throw new Error('no audio');
+    const sampleRate=parseInt(mimeType.match(/rate=(\d+)/)?.[1]||'24000',10);
+    const binary=atob(audioData);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    const pcm16=new Int16Array(bytes.buffer);
+    const wavBlob=pcmToWav(pcm16,sampleRate);
+    const url=URL.createObjectURL(wavBlob);
+    if(audioCtx){
+      if(audioCtx.state==='suspended') await audioCtx.resume();
+      const arrayBuf=await wavBlob.arrayBuffer();
+      const decoded=await audioCtx.decodeAudioData(arrayBuf);
+      const src=audioCtx.createBufferSource();
+      src.buffer=decoded; src.connect(audioCtx.destination); src.start(0);
+      src.onended=()=>URL.revokeObjectURL(url);
     } else {
-      const audio = new Audio(url);
-      audio.onended = () => URL.revokeObjectURL(url);
+      const audio=new Audio(url);
+      audio.onended=()=>URL.revokeObjectURL(url);
       await audio.play();
     }
     return;
-  } catch(e) {
-    console.warn('Gemini TTS 失敗:', e.message);
-  }
-
-  // Fallback: 瀏覽器內建 TTS
-  if (!window.speechSynthesis) return;
+  } catch(e){ console.warn('Gemini TTS 失敗:',e.message); }
+  // Fallback
+  if(!window.speechSynthesis) return;
   speechSynthesis.cancel();
-  const sentences = clean.match(/[^，。！？、]+[，。！？、]?/g) || [clean];
-  let i = 0;
-  function speakNext() {
-    if (i >= sentences.length) return;
-    const u = new SpeechSynthesisUtterance(sentences[i]);
-    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 1.3; u.volume = 1.0;
-    const voices = speechSynthesis.getVoices();
-    const preferred = ['Meijia', 'Sin-ji', 'Tingting', 'Google 普通話', 'Google Chinese'];
-    let picked = null;
-    for (const name of preferred) {
-      picked = voices.find(v => v.name.includes(name));
-      if (picked) break;
-    }
-    if (!picked) picked = voices.find(v => v.lang === 'zh-TW') || voices.find(v => v.lang.startsWith('zh'));
-    if (picked) u.voice = picked;
-    u.onend = () => { i++; speakNext(); };
-    u.onerror = () => { i++; speakNext(); };
+  const sentences=clean.match(/[^，。！？、]+[，。！？、]?/g)||[clean];
+  let i=0;
+  function speakNext(){
+    if(i>=sentences.length) return;
+    const u=new SpeechSynthesisUtterance(sentences[i]);
+    u.lang='zh-TW'; u.rate=0.82; u.pitch=1.3; u.volume=1.0;
+    const voices=speechSynthesis.getVoices();
+    const preferred=['Meijia','Sin-ji','Tingting','Google 普通話','Google Chinese'];
+    let picked=null;
+    for(const name of preferred){ picked=voices.find(v=>v.name.includes(name)); if(picked) break; }
+    if(!picked) picked=voices.find(v=>v.lang==='zh-TW')||voices.find(v=>v.lang.startsWith('zh'));
+    if(picked) u.voice=picked;
+    u.onend=()=>{i++;speakNext();}; u.onerror=()=>{i++;speakNext();};
     speechSynthesis.speak(u);
   }
   speakNext();
 }
+
 setInterval(()=>{
   if(listening) return;
   const eL=document.getElementById('eL'),eR=document.getElementById('eR');
@@ -521,7 +632,6 @@ setInterval(()=>{
   eL.style.transform=eR.style.transform='scaleY(0.08)';
   setTimeout(()=>{eL.style.transform=eR.style.transform='';},140);
 },4000);
-
 </script>
 </body>
 </html>
