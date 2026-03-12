@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>麥斯小天使</title>
+<title>麥芽糖老師</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -212,7 +212,7 @@ body {
 <!-- ── MAIN APP ── -->
 <div id="app">
   <div class="wrap">
-    <div class="title" id="appTitle">👼 麥斯小天使</div>
+    <div class="title" id="appTitle">👼 麥芽糖老師</div>
     <div class="sub">說出你的問題，我來回答！</div>
 
     <div class="robot-wrap">
@@ -243,7 +243,7 @@ body {
     </div>
 
     <div class="bubble" id="bubble">
-      <div class="bubble-text" id="btext">你好！我是<span id="botNameDisplay">麥斯小天使</span> 😊<br>點麥克風，說出你的問題吧！</div>
+      <div class="bubble-text" id="btext">你好！我是<span id="botNameDisplay">麥芽糖老師</span> 😊<br>點麥克風，說出你的問題吧！</div>
     </div>
 
     <div class="status" id="status">👆 點麥克風開始說話</div>
@@ -273,7 +273,7 @@ body {
 <script>
 // ── 狀態 ──────────────────────────────────────────
 let apiKey = '';
-let botName = '麥斯小天使';
+let botName = '麥芽糖老師';
 let botImageData = null; // base64
 let audioCtx = null;
 
@@ -353,7 +353,7 @@ function showImgPreview(src) {
 }
 
 function applySettings() {
-  const nameVal = document.getElementById('botNameInput').value.trim() || '麥斯小天使';
+  const nameVal = document.getElementById('botNameInput').value.trim() || '麥芽糖老師';
   botName = nameVal;
   try { localStorage.setItem('maxbot_name', botName); } catch(e) {}
 
