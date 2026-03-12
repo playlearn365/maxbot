@@ -653,7 +653,7 @@ async function speak(text) {
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key='+apiKey,
       { method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
-          contents:[{parts:[{text:'請用活潑輕快的台灣國語說（語速稍快）：'+clean}]}],
+          contents:[{parts:[{text:'請用像卡通的活潑童聲說，聲音輕巧可愛、語調上揚，像在跟幼兒園小朋友說話，用台灣國語說：'+clean}]}],
           generationConfig:{
             responseModalities:['AUDIO'],
             speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:'Aoede'}}}
